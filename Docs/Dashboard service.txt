@@ -1,0 +1,30 @@
+
+SOW for Dashboard module:
+
+
+File structure:
+├── DashboardService/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── com/
+│   │   │   │       └── example/
+│   │   │   │           └── dashboard/
+│   │   │   │               ├── controller/
+│   │   │   │               │   └── DashboardController.java   # Handles requests for dashboard data
+│   │   │   │               ├── service/
+│   │   │   │               │   └── DashboardService.java      # Business logic for dashboard data
+│   │   │   │               ├── model/
+│   │   │   │               │   └── DashboardData.java         # Model for dashboard data
+│   │   │   │               ├── repository/
+│   │   │   │               │   └── DashboardRepository.java   # Repository interface for MongoDB access
+│   │   │   │               └── config/
+│   │   │   │                   └── DashboardConfig.java       # Configuration for dashboard service
+│   │   └── resources/
+│   │       ├── application.properties                         # Spring Boot configurations specific to the DashboardService
+│   │       └── logback-spring.xml                             # Logging configuration (optional)
+│   ├── build.gradle                                           # Build configuration file
+│   └── Dockerfile                                             # Docker configuration file for containerization
+
+
+

@@ -1,0 +1,614 @@
+
+Introduction 
+
+Project Overview: Timescape NU serves a corporate audience of BCCL group with a robust solution for handling reimbursements, payslips, LTA, OCA, and more, with integration with external APIs and few content managed through a CMS. 
+
+Objectives: Seamless user experience, secure API integration, data-driven decision-making using dashboards, etc. 
+
+Technologies Used: 
+
+Frontend: Angular18 
+
+Backend: Java (Spring Boot) 
+
+Database: MongoDB 
+
+Architecture: Microservices 
+
+Integration: REST APIs for external data 
+
+Authentication: OAuth/AD Integration 
+
+Project Architecture 
+
+Data Storage (MongoDB): 
+
+Schema Design: 
+
+Users: User profile, role, permissions. 
+
+Payslips: Monthly payslip data for users. 
+
+Posts, Polls, Humor: CMS-related content. 
+
+Reimbursements: Data collected from APIs, organized by user. 
+
+Indexes: Use indexes for frequently queried fields to enhance read performance. 
+
+Database Communication: Java microservices use Spring Data MongoDB for data access. 
+
+External Integrations: 
+
+Active Directory for Login: Use OAuth2 to authenticate users. 
+
+System Overview: The application consists of multiple services working together. The frontend communicates with the backend. 
+
+Frontend (Angular): 
+
+User Interface (UI): Created using Angular and Angular Material for UI components. 
+
+Routing & State Management: Implemented using Angular Router and NgRx (or similar) for state management. 
+
+Authentication: implementation of JWT token for authentication 
+
+Backend (Java & Spring Boot): 
+
+Microservices: Independent services that can be scaled individually. Communication between services will happen using REST API. Each service has a single responsibility: 
+
+Authentication Service: Handles login via AD. 
+
+ 
+
+Dashboard Service: Collects and provides data summaries for the dashboard. 
+
+Reimbursements Service: Interacts with external services, processes, and stores data. 
+
+Payslip Service: Fetches and stores payslips monthly. 
+
+Notification Service: Manages and aggregates notifications. 
+
+Content Management (CMS) Service: CRUD operations for posts, quick links, humor, polls, etc. 
+
+High-Level Architectural Diagram: 
+
+A diagram illustrating How Frontend interact with microservices. 
+
+ 
+
+ 
+
+Spring Boot Microservices : 
+
+ 
+
+ 
+
+Module-wise Technical Details 
+
+Authentication Module: 
+
+Login via AD: 
+
+Flow: User credentials sent to backend → Authentication Service validates with AD using OAuth2 → Generates JWT token. 
+
+For AD – BCCL LDAP will be used on successful login the token will be generated. Time Stamp to expiry this token will be needed 
+
+Security Protocols: OAuth2, JWT tokens for subsequent API calls. 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Dashboard Module: 
+
+Exception/Reimbursement/LTA/OCA -  
+
+ 
+
+Workflow: Fetches data for modules from external services 
+
+Implementation:  
+
+Approach 1: Direct REST API Integration within Intranet 
+
+Architecture Overview: 
+
+The external system provides a REST API for fetching leave data. 
+
+The Spring Boot wrapper API can directly call the external system's API since both systems reside within the same network. 
+
+We can fetch the data basis on Last Updated Date which will be maintained in our database 
+
+Steps to Implement: 
+
+API Communication: 
+
+Use RestTemplate or WebClient in the Spring Boot application to make REST API calls to the external system. 
+
+Implement a service layer in the wrapper API to manage these calls. 
+
+Error Handling: 
+
+Integrate a retry mechanism using Resilience4j to handle transient failures (e.g., network issues or timeouts). 
+
+Use a circuit breaker pattern to avoid repeatedly calling a failing service and maintain system stability. 
+
+Data Caching: 
+
+Cache leaves data in an in-memory cache (e.g., Redis) to improve response times for frequently accessed data. 
+
+Frontend Integration: 
+
+Create an API endpoint in the Spring Boot wrapper that the Frontend app can call to fetch leave data. 
+
+The Frontend requests the leave data through this endpoint, which either fetches it from cache or directly from the external system based on cache validity. 
+
+Advantages: 
+
+Since both systems are on the same network, latency is low, and communication is straightforward. 
+
+Caching improves performance by reducing the need to repeatedly call the external system. 
+
+Conclusion: (Direct REST API Integration) is ideal if you need up-to-date information, and real-time integration is preferred. It is also straightforward due to the shared network. 
+
+Approach 2: Event-Driven Integration Using Database Synchronization 
+
+Architecture Overview: 
+
+The data from the external system is periodically synchronized with the local database. 
+
+The Spring Boot wrapper serves data from this database to the Frontend. 
+
+Steps to Implement: 
+
+Batch Synchronization Jobs: 
+
+Create a scheduled batch job using @Scheduled annotation in Spring Boot to periodically pull data from the external system's API. 
+
+Store the fetched data in a local database. 
+
+Database Management: 
+
+Add timestamps or version control to track updates from the external system. 
+
+Frontend Integration: 
+
+The Spring Boot wrapper API exposes an endpoint that the Frontend can call to get data. 
+
+The data is fetched from the local database, providing faster response times. 
+
+Advantages: 
+
+The data is available in a local database, which reduces dependency on real-time connectivity to the external system. 
+
+Useful for scenarios where immediate real-time updates are not necessary. 
+
+Conclusion: 
+
+(Event-Driven Integration Using Database Synchronization) is well-suited if data freshness is not critical, reducing the load on the external system. 
+
+Approach 3: Message-Based Integration 
+
+Architecture Overview: 
+
+Use a messaging system to communicate changes in data from the external system to the Spring Boot wrapper API. 
+
+Steps to Implement: 
+
+Messaging System: 
+
+Use a messaging broker like RabbitMQ or Apache Kafka. 
+
+Configure the external system to send messages to the messaging broker whenever data changes. 
+
+Listener Implementation: 
+
+Develop a listener in the Spring Boot wrapper that subscribes to the messaging queue. 
+
+When a new message arrives, update the local cache or database with the new data. 
+
+Frontend Integration: 
+
+The Frontend fetches the data through an API endpoint on the Spring Boot wrapper. 
+
+Since data is pushed through the message broker, the information served to the Frontend is always updated in near real-time. 
+
+Advantages: 
+
+Provides real-time synchronization between the external system and the Spring Boot wrapper. 
+
+The system is decoupled, providing flexibility and scalability. 
+
+Conclusion 
+
+(Message-Based Integration) provides real-time data availability without continuous polling, which is helpful for high scalability. 
+
+ 
+
+PaySlips -  
+
+ 
+
+Workflow: FetchesPayslips data 
+
+Implementation:  
+
+          Approach 1: Direct API Integration with PDF Generation 
+
+Architecture Overview: 
+
+Use your Java Spring Boot wrapper to interact with the external system's API and generate a downloadable payslip in PDF format. 
+
+Steps to Implement: 
+
+Payslip Fetching: 
+
+In Spring Boot application, using RestTemplate or WebClient to call the external system’s API to fetch the monthly payslip data. The Base64 Data will be downloaded which has been received from API 
+
+PDF Generation: 
+
+We can use a PDF generation library like iText or Apache PDFBox in the wrapper API to create the payslip as a downloadable PDF. 
+
+Data Caching: 
+
+Cache the fetched payslip data in an in-memory cache like Redis for a short duration (e.g., the rest of the month). 
+
+This reduces repeated calls to the external system for the same data. 
+
+Endpoints: 
+
+Creating two endpoints in the Spring Boot wrapper: 
+
+One for fetching payslip details to display in the Angular application. 
+
+One for downloading the payslip as a PDF, with the necessary data generated on demand. 
+
+Angular Integration: 
+
+The Angular app calls the API to display payslip details on the UI. 
+
+Include a "Download" button that calls the download endpoint, allowing the user to download the generated PDF. 
+
+Advantages: 
+
+The payslip is generated on demand, so it's always up-to-date. 
+
+The wrapper API ensures a seamless experience between fetching and downloading payslip data. 
+
+ 
+
+Approach 2: Batch Data Synchronization with Pre-Generated PDFs 
+
+Architecture Overview: 
+
+Fetch the payslip data on a schedule, generate PDFs, and store them locally in a file server or database. 
+
+Steps to Implement: 
+
+Batch Synchronization: 
+
+Use the @Scheduled annotation in Spring Boot to create a job that runs at the beginning of each month to pull payslip data from the external system. 
+
+PDF Generation and Storage: 
+
+For each employee, generate a payslip PDF using iText or Apache PDFBox. 
+
+Store the PDF files in a local file server or store them as binary data in a database. 
+
+Data Caching: 
+
+Cache the fetched payslip data in an in-memory cache like Redis for a short duration (e.g., the rest of the month). 
+
+This reduces repeated calls to the external system for the same data. 
+
+Cache Invalidation: We can implement cache invalidation strategies for time-sensitive data such as PunchIn/PunchOut and Payslips. Cached data should expire after a specified time. Consider using Redis with a time-to-live (TTL) setting for cached entries to prevent stale data. 
+
+ 
+
+Endpoints: 
+
+One endpoint for the Angular app to display payslip information fetched from the database. 
+
+Another endpoint for downloading the pre-generated PDF. 
+
+Angular Integration: 
+
+The Angular app interacts with the Spring Boot API to fetch and display the payslip. 
+
+The "Download" button triggers a request to download the pre-generated PDF. 
+
+Advantages: 
+
+Reduced load on the external system as payslip data is fetched only once per month. 
+
+Quick response times for PDF downloads as they are pre-generated. 
+
+ 
+
+PunchIn/PunchOut-  
+
+ 
+
+Time Logging: 
+
+Integration: Time punches (in/out) via external system(UKG System). We need API to fetch the data of Punch IN/OUT. Also API to submit data.  
+
+Data Storage: Stored in MongoDB for audit and reporting. 
+
+Workflow: Fetch PunchIN & PunchOut Data. IN & Out will be display as per the avaibility of Data. If user has already punchin then Punchout button will be displayed, and the cycle repeats after 24hrs. 
+
+Implementation: 
+
+Approach 1: Direct Data Synchronization with Local Storage 
+
+Architecture Overview: 
+
+Store PunchIn/PunchOut data locally, allowing for both fetching and submission without real-time dependency on the external system. 
+
+Steps to Implement: 
+
+Local Database Storage: 
+
+Use a local relational database to store all fetched PunchIn/PunchOut data. 
+
+A scheduled job in Spring Boot can synchronize data with the external system. 
+
+Direct Submission: 
+
+When a user submits their PunchIn/PunchOut data, store it locally first. 
+
+Synchronize this data to the external system in the next synchronization job or in real-time as needed. 
+
+Angular Integration: 
+
+The Angular app retrieves data from the local storage through the wrapper API. 
+
+Users submit their PunchIn/PunchOut through the wrapper API, which is stored locally and later synchronized with the external system. 
+
+Advantages: 
+
+Reduces real-time dependency on the external system, providing a more stable user experience. 
+
+Data submission is tracked locally, allowing for resubmission if any synchronization issues occur. 
+
+ 
+
+Corporate/Employee Engage/-  
+
+ 
+
+Workflow: Fetch Corporate data feeded by HR 
+
+Implementation: 
+
+Approach: Modular Backend with REST API and Maker-Checker Workflow 
+
+Architecture Overview: 
+
+Build a modular backend using Java Spring Boot with REST API endpoints for different CMS modules (Notifications, Leader Connect, Poll, and Humor). 
+
+Implement a Maker-Checker workflow for approval processes. 
+
+Steps to Implement: 
+
+Modular Design: 
+
+Separate each module (Notifications, Leader Connect, Poll, Humour) into its own service class in Spring Boot. 
+
+Expose REST API endpoints for CRUD operations for each module. 
+
+Maker-Checker Workflow: 
+
+Implement a Maker-Checker pattern using Spring Boot. 
+
+Define roles like Maker (who creates or edits content) and Checker (who approves the content). 
+
+Store content in a draft state when submitted by Maker, then change to approved/published state once reviewed by Checker. 
+
+Role-Based Access Control: 
+
+Use Spring Security to implement role-based access control (e.g., Admin, Maker, Checker, Viewer). 
+
+Assign roles and permissions based on CRUD operations allowed for each module. 
+
+Angular Integration: 
+
+Create components for each module (Notifications, Leader Connect, etc.). 
+
+Implement forms for Makers to submit content and dashboards for Checkers to approve or reject content. 
+
+Real-Time Updates (WebSocket's): we can use WebSocket's for in-app, real-time notifications. For example, notify users immediately when there's a new message or update relevant to their session. 
+
+Retry Logic and Fault Tolerance: 
+
+Use Resilience4j to implement retry logic in case of network failures. 
+
+Handle failed submissions gracefully by keeping track of them and retrying when the external system is available. 
+
+Data Consistency: 
+
+Ensure data consistency by implementing idempotent operations to avoid duplicate submissions. 
+
+Consider adding a unique identifier for each entry. 
+
+4. Security and Network Considerations for All Approaches 
+
+Authentication and Authorization: 
+
+Since the systems are within the same network, use Spring Security for access control. This ensures that only authorized requests are processed by the wrapper API. 
+
+If the external system requires authentication, use OAuth or another secure mechanism to protect API access. 
+
+Network Configuration: 
+
+Ensure firewall settings allow communication between the wrapper API and the external system. 
+
+Since both are on an intranet, maintain a clear network topology with restricted access to sensitive endpoints to avoid unauthorized access. 
+
+Logging and Monitoring: 
+
+Implement Spring Boot Actuator to monitor the health of the wrapper API. 
+
+Use logging frameworks like Log4J and tools like ELK Stack (Elasticsearch, Logstash, Kibana) to manage and analyze logs, which helps in diagnosing network or integration issues. 
+
+Log service requests, responses, errors, and warnings. 
+
+Any request which hits middleware is logged. Sensitive information is masked during logging. The following request and response scenarios are logged in the ‘Log file’ along with date and time stamp. 
+
+ Access Log: Request from frontend application and response going to frontend application are captured in this. 
+
+Service Log: Third party request/response is captured in this. 
+
+Error Log: Exceptions and Errors are captured in this. 
+
+Java Log4J audit logging framework will be integrated for logging. Logging to console is controlled by logging configuration. Only error logs will be allowed to log in console and all other logs are written to respective storage. 
+
+Unique Auto generated “traceId” is tagged to each request. This “traceId” will follow from Entry point to Exit point of the API along with its path across microservice journey. On every microservice level additional “spanId” is attached to “traceId”. Hence traceid/spanid combination will provide complete path visibility of the API journey from entry to exit. 
+
+Expand Error Logging: Include detailed logging of error levels (e.g., critical, warning, informational). Define log management practices involving monitoring, notifications, and alerting based on error severity. Implement custom exception handling for different failure types (e.g., API failures, database issues), ensuring each category of errors is handled appropriately and logged with relevant details. 
+
+Monitoring: 
+
+Health Checks: Each microservice has a health check endpoint to monitor its status. 
+
+Caching: 
+
+Use Redis for caching frequently accessed data (e.g., dashboard summaries). 
+
+Performance Benchmarks: Define performance benchmarks for critical API calls, data fetches, and cache hit rates. For example, establish that an API response should not exceed __ ms for optimal user experience. This can serve as a guideline during system testing and tuning. Additionally, establish monitoring for key metrics such as database query performance, API response times, and cache access times to detect performance bottlenecks early. 
+
+WebSocket -   
+
+ 
+
+Data Protection: 
+
+Data encryption in transit using HTTPS. 
+
+Sensitive data stored in MongoDB will be encrypted at rest using AES-256 encryption or a similar standard to ensure data security. 
+
+Role-Based Access Control (RBAC): 
+
+Different roles for Admin, Users, Approvers to limit actions. 
+
+ 
+
+Security Aspects that will be taken care in Web Application 
+
+1 
+
+Latest and recommended version of Angular and supporting libraries will be used to avoid vulnerabilities 
+
+2 
+
+Session management with JWT access token and refresh tokens will be used to achieve stateless, single page application model 
+
+3 
+
+Latest and recommended TLS will be used communicate encrypted payload between client and server 
+
+4 
+
+Input parameters should be validated for correct format, syntax, and types. 
+
+5 
+
+Data Masking of sensitive data should be adopted.  
+
+6 
+
+Every API request is tagged with unique identifier and hence multiple call of the same API is detected at server end. This will protect against Denial of Service (DoS) and attacks against authentication flaws such as brute force.  
+
+ 
+
+Mode 
+
+Security Aspects that will be taken care at Server 
+
+API Security 
+
+Hypertext Transfer Protocol Secure (HTTPS) Transport Layer Security (TLS) v1.2 or greater will be used 
+
+Week ciphers are disabled- (e.g., AES128-SHA, ECDHE-RSA-AES128-SHA etc.) 
+
+Uniform Resource Identifiers (URIs) will be used to identify certain data  
+
+Use of Unicode for encoding  
+
+All responses will contain the XContent- Type-Options: nosniff and Strict Transport Security headers  
+
+Unnecessary HTTP methods, permissive Cross-Origin resource sharing (CORS) are disabled. 
+
+Query strings are not used for defining the behaviour of the API. (GET is not used only POST method is used) 
+
+Network Security 
+
+All API calls between server and clients should happen over SSL layer (HTTPs) 
+
+All internal networks should be protected using the firewall and internet facing services should be placed in DMZ. 
+
+Unnecessary ports and services are disabled 
+
+Appropriate security would be in place to prevent DDoS attacks. 
+
+ 
+
+5 Backup, Recovery, and Failover Plan 
+
+Database Backups: 
+
+Automated backups for MongoDB. 
+
+Hot Backups: 
+
+Use MongoDB's native tools like mongo dump and mongo restore to create live, hot backups without interrupting the application’s availability. 
+
+Recovery Strategy: 
+
+Implement PITR to recover the database to a specific moment in time, minimizing data loss in case of corruption or accidental deletion. 
+
+Failover Strategy: 
+
+Replica sets for MongoDB for high availability 
+
+Monitoring Alerts: 
+
+Implement a Monitoring and Alerting System (e.g., Nagios, Prometheus) to track the health of your MongoDB instances and replication status. 
+
+
+
+

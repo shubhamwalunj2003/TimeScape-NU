@@ -1,0 +1,246 @@
+
+TimeScape_NU
+├──Timescape-NU-Frontend
+├──Timescape-NU-Backend
+├──Images
+└──Docs
+
+
+Timescape-NU-Frontend
+│
+├── e2e/                             # End-to-end testing
+├── node_modules/                    # Node dependencies
+├── src/
+│   ├── app/
+│   │   ├── auth/                    # Authentication components
+│   │   │   ├── login/
+│   │   │   │   ├── login.component.html
+│   │   │   │   ├── login.component.ts
+│   │   │   │   ├── login.component.css
+│   │   │   │   └── login.component.spec.ts
+│   │   │   └── auth.service.ts      # Auth service for JWT handling
+│   │   ├── dashboard/               # Dashboard components
+│   │   │   ├── dashboard.component.html
+│   │   │   ├── dashboard.component.ts
+│   │   │   └── dashboard.component.css
+│   │   ├── reimbursements/          # Reimbursements module
+│   │   │   ├── reimbursements.component.html
+│   │   │   ├── reimbursements.component.ts
+│   │   │   └── reimbursements.component.css
+│   │   ├── payslips/                # Payslips module
+│   │   │   ├── payslip-list/        # List of payslips
+│   │   │   │   ├── payslip-list.component.html
+│   │   │   │   ├── payslip-list.component.ts
+│   │   │   │   └── payslip-list.component.css
+│   │   ├── cms/                     # CMS module for content management
+│   │   │   ├── cms-list/            # CMS content list
+│   │   │   │   ├── cms-list.component.html
+│   │   │   │   ├── cms-list.component.ts
+│   │   │   │   └── cms-list.component.css
+│   │   ├── shared/                  # Shared utilities
+│   │   │   ├── models/              # Models for type safety
+│   │   │   │   ├── user.model.ts
+│   │   │   │   ├── reimbursement.model.ts
+│   │   │   │   └── payslip.model.ts
+│   │   │   ├── services/            # Shared services
+│   │   │   │   ├── api.service.ts   # Base service for API requests
+│   │   │   │   ├── jwt.interceptor.ts # JWT Interceptor for adding tokens
+│   │   │   │   └── error-handler.ts # Global error handling
+│   │   ├── app-routing.module.ts    # Routing configuration
+│   │   ├── app.component.html       # Main component HTML
+│   │   ├── app.component.ts         # Main component TS
+│   │   ├── app.module.ts            # Root module
+│   │   └── main.ts                  # Main entry point
+│   ├── assets/                      # Static assets (images, etc.)
+│   ├── environments/                # Environment configuration
+│   │   ├── environment.prod.ts
+│   │   └── environment.ts
+├── .gitignore                       # Git ignore file
+├── angular.json                     # Angular CLI configuration
+├── package.json                     # NPM dependencies
+└── tsconfig.json                    # TypeScript configuration
+
+
+Timescape-NU-Backend/
+├── client-side/                    # Angular frontend code
+│   ├── e2e/                        # End-to-end testing for Angular
+│   ├── node_modules/               # Node dependencies
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── auth/               # Login and authentication components
+│   │   │   ├── dashboard/          # Dashboard view components
+│   │   │   ├── reimbursements/     # Reimbursement-related components
+│   │   │   ├── payslips/           # Payslip view and management components
+│   │   │   ├── cms/                # CMS content management components
+│   │   │   ├── shared/             # Shared models and services (e.g., JWT, APIs)
+│   │   ├── assets/                 # Static assets for the frontend
+│   │   ├── environments/           # Environment configurations
+│   ├── angular.json                # Angular CLI configuration
+│   ├── package.json                # NPM dependencies
+│   ├── tsconfig.json               # TypeScript configuration
+│   └── .gitignore                  # Git ignore file for frontend
+
+├── eureka-discovery-service/       # Eureka service discovery
+│   ├── src/
+│   │   ├── main/java/com/sha/eureka/
+│   │   │   ├── EurekaDiscoveryServiceApplication.java
+│   │   ├── resources/
+│   │   │   ├── application.properties  # Eureka configurations
+│   ├── build.gradle
+│   └── settings.gradle
+
+├── AuthenticationService/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   ├── com.example.authentication/
+│   │   │   │   │   ├── controller/
+│   │   │   │   │   │   └── AuthController.java      # Handles login and JWT generation
+│   │   │   │   │   ├── service/
+│   │   │   │   │   │   └── AuthService.java         # LDAP validation, JWT logic
+│   │   │   │   │   ├── config/
+│   │   │   │   │   │   └── SecurityConfig.java      # OAuth2 and JWT configuration
+│   │   │   │   │   ├── model/
+│   │   │   │   │   │   └── User.java                # User entity
+│   │   │   │   │   ├── dto/
+│   │   │   │   │   │   └── LoginRequest.java        # DTO for login payload
+│   │   │   │   └── resources/
+│   │   │   │       ├── application.properties       # Service configurations
+│   │   ├── test/                                    # Unit and integration tests
+│   ├── build.gradle                                 # Gradle build configuration
+│   └── Dockerfile                                   # Dockerfile for containerizing the service
+│
+├── DashboardService/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── com/
+│   │   │   │       └── example/
+│   │   │   │           └── dashboard/
+│   │   │   │               ├── controller/
+│   │   │   │               │   └── DashboardController.java   # Handles requests for dashboard data
+│   │   │   │               ├── service/
+│   │   │   │               │   └── DashboardService.java      # Business logic for dashboard data
+│   │   │   │               ├── model/
+│   │   │   │               │   └── DashboardData.java         # Model for dashboard data
+│   │   │   │               ├── repository/
+│   │   │   │               │   └── DashboardRepository.java   # Repository interface for MongoDB access
+│   │   │   │               └── config/
+│   │   │   │                   └── DashboardConfig.java       # Configuration for dashboard service
+│   │   └── resources/
+│   │       ├── application.properties                         # Spring Boot configurations specific to the DashboardService
+│   │       └── logback-spring.xml                             # Logging configuration (optional)
+│   ├── build.gradle                                           # Build configuration file
+│   └── Dockerfile                                             # Docker configuration file for containerization
+│
+├── ReimbursementService/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── com/
+│   │   │   │       └── example/
+│   │   │   │           └── reimbursement/
+│   │   │   │               ├── controller/
+│   │   │   │               │   └── ReimbursementController.java   # Handles reimbursement requests
+│   │   │   │               ├── service/
+│   │   │   │               │   └── ReimbursementService.java      # Business logic for reimbursements
+│   │   │   │               ├── model/
+│   │   │   │               │   └── Reimbursement.java             # Model for reimbursement data
+│   │   │   │               ├── repository/
+│   │   │   │               │   └── ReimbursementRepository.java   # Repository for MongoDB access
+│   │   │   │               └── config/
+│   │   │   │                   └── ReimbursementConfig.java       # Configuration specific to reimbursement service
+│   │   └── resources/
+│   │       ├── application.properties                            # Configuration for reimbursement service
+│   │       └── logback-spring.xml                                # Logging configuration
+│   ├── build.gradle                                              # Build file
+│   └── Dockerfile                                                # Docker configuration file
+│
+├── PayslipService/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── com/
+│   │   │   │       └── example/
+│   │   │   │           └── payslip/
+│   │   │   │               ├── controller/
+│   │   │   │               │   └── PayslipController.java       # Handles payslip requests
+│   │   │   │               ├── service/
+│   │   │   │               │   └── PayslipService.java          # Business logic for payslips
+│   │   │   │               ├── model/
+│   │   │   │               │   └── Payslip.java                 # Model for payslip data
+│   │   │   │               ├── repository/
+│   │   │   │               │   └── PayslipRepository.java       # Repository for MongoDB access
+│   │   │   │               └── config/
+│   │   │   │                   └── PayslipConfig.java           # Configuration for payslip service
+│   │   └── resources/
+│   │       ├── application.properties                           # Payslip service configurations
+│   │       └── logback-spring.xml                               # Logging configuration
+│   ├── build.gradle                                             # Build file
+│   └── Dockerfile                                               # Docker configuration
+│
+├── CMSService/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── com/
+│   │   │   │       └── example/
+│   │   │   │           └── cms/
+│   │   │   │               ├── controller/
+│   │   │   │               │   └── CMSController.java           # Handles CMS content requests
+│   │   │   │               ├── service/
+│   │   │   │               │   └── CMSService.java              # Business logic for CMS
+│   │   │   │               ├── model/
+│   │   │   │               │   └── CMSContent.java              # Model for CMS data
+│   │   │   │               ├── repository/
+│   │   │   │               │   └── CMSRepository.java           # Repository for MongoDB access
+│   │   │   │               └── config/
+│   │   │   │                   └── CMSConfig.java               # Configuration for CMS service
+│   │   └── resources/
+│   │       ├── application.properties                           # Configuration specific to CMS service
+│   │       └── logback-spring.xml                               # Logging configuration
+│   ├── build.gradle                                             # Build file
+│   └── Dockerfile                                               # Docker configuration
+└── GatewayService/
+    ├── src/
+    │   ├── main/
+    │   │   ├── java/com/example/gateway/
+    │   │   │   ├── GatewayApplication.java                     # Main application for routing
+    │   │   │   └── config/
+    │   │   │       └── RouteConfig.java                        # Configuration for routes to microservices
+    │   ├── resources/
+    │   │   ├── application.properties                          # Configuration for the gateway
+    │   │   └── logback-spring.xml                              # Logging configuration for gateway
+    ├── build.gradle                                            # Build file for the gateway
+    └── Dockerfile                                              # Docker configuration for the gateway
+
+
+├── zuul-gateway-service/           # Zuul gateway for API routing
+│   ├── src/
+│   │   ├── main/java/com/sha/gateway/
+│   │   │   ├── ZuulGatewayServiceApplication.java
+│   │   │   └── config/
+│   │   │       └── RouteConfig.java # Configuration for routing microservice requests
+│   │   └── resources/
+│   │       └── application.properties # Zuul-specific configurations
+│   ├── build.gradle
+│   ├── settings.gradle
+│   └── .gitignore
+
+├── MongoDB/                        # Local MongoDB for data storage
+│   └── collections/
+│       ├── users/                  # Users collection
+│       ├── payslips/               # Payslips collection
+│       ├── reimbursements/         # Reimbursements collection
+│       └── cmsContent/             # CMS content collection
+
+├── images/                         # Docker images or deployment files
+│   ├── Dockerfile-client           # Dockerfile for Angular app
+│   ├── Dockerfile-course-service   # Dockerfile for Course Management Service
+│   ├── Dockerfile-user-service     # Dockerfile for User Management Service
+│   ├── Dockerfile-eureka           # Dockerfile for Eureka server
+│   ├── Dockerfile-zuul             # Dockerfile for Zuul gateway
+│   └── docker-compose.yml          # Docker Compose file for orchestrating services
+
+├── README.md                       # Project documentation
+└── .gitignore                      # Git ignore file for project root
